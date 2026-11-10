@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """GraphQL documents. Every field used here was checked against
 https://frontify.github.io/graphql-reference/ (see docs/FRONTIFY_API.md).
 

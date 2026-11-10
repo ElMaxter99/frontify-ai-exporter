@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Local web UI (binds to 127.0.0.1). One job at a time, state in memory, nothing persisted but the export folder."""
 from __future__ import annotations
 

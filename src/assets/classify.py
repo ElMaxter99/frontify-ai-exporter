@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Asset categorisation and MIME detection (heuristic; Frontify exposes no logo/icon flag on Asset)."""
 from __future__ import annotations
 

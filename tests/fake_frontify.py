@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """An in-process fake of the Frontify GraphQL API + CDN, built on httpx.MockTransport.
 
 It implements only what the exporter queries (dispatching on the document's operation name)

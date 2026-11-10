@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Discover everything the token can access and keep it in memory (no database)."""
 from __future__ import annotations
 

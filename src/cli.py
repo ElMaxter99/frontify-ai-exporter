@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """``python -m src`` opens the UI; ``python -m src export --url … --dest …`` runs headless."""
 from __future__ import annotations
 

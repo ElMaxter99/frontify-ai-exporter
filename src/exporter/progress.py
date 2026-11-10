@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Live counters + log tail shown by the UI. Plain in-memory object, no persistence."""
 from __future__ import annotations
 

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Filesystem helpers: slugs, safe names, hashing, atomic JSON writes."""
 from __future__ import annotations
 

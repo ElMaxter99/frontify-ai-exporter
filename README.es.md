@@ -8,7 +8,8 @@
 
 [![CI](https://github.com/ElMaxter99/frontify-ai-exporter/actions/workflows/ci.yml/badge.svg)](https://github.com/ElMaxter99/frontify-ai-exporter/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/ElMaxter99/frontify-ai-exporter/actions/workflows/codeql.yml/badge.svg)](https://github.com/ElMaxter99/frontify-ai-exporter/actions/workflows/codeql.yml)
-[![Licencia: MIT](https://img.shields.io/badge/licencia-MIT-d4af37.svg)](LICENSE)
+[![Licencia: Apache-2.0](https://img.shields.io/badge/licencia-Apache--2.0-d4af37.svg)](LICENSE)
+![Sin relación con Frontify](https://img.shields.io/badge/Frontify-sin%20afiliaci%C3%B3n-8a8fa8)
 ![Python](https://img.shields.io/badge/Python-3.11%E2%80%933.13-3776AB?logo=python&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-listo-2496ED?logo=docker&logoColor=white)
 ![Dependabot](https://img.shields.io/badge/Dependabot-activo-025E8C?logo=dependabot&logoColor=white)
@@ -20,7 +21,13 @@
 
 ---
 
-> 🪧 **La verdad por delante:** son dos scripts que hice para exportar el Frontify de un cliente a una carpeta. Quizá a ti también te sirvan, así que aquí quedan: gratis, con licencia MIT y sin promesas de soporte. Úsalos, haz un fork, mejóralos.
+> ⚖️ **Proyecto comunitario independiente: no está afiliado, respaldado ni patrocinado por Frontify.** Lee el [aviso legal](DISCLAIMER.md).
+
+> 🪧 **La verdad por delante:** son dos scripts que hice para exportar el Frontify de un cliente a una carpeta. Quizá a ti también te sirvan, así que aquí quedan: gratis, con licencia Apache 2.0 y sin promesas de soporte. Úsalos, haz un fork, mejóralos.
+
+## 🎯 ¿Para qué sirve?
+
+Si tú —o tu cliente— tienes un portal de marca en Frontify bien definido, esto genera el **contexto que una IA necesita para respetar la marca**: colores, tipografías, reglas de logo, tono de voz, guidelines y un índice de todos los recursos, todo sacado del propio Frontify (nunca inventado). Pasa la carpeta a ChatGPT, Claude, Cursor, Codex o a tu propio RAG y seguirá los estilos y normas. Paso a paso: [`docs/USE_WITH_AI.md`](docs/USE_WITH_AI.md) · dudas: [`docs/FAQ.md`](docs/FAQ.md).
 
 ## ✨ ¿Qué hace?
 
@@ -143,14 +150,14 @@ También se listan en cada `EXPORT_REPORT.json`:
 <details>
 <summary><b>Cómo se hizo</b></summary>
 
-Construido en una sesión de programación en pareja con un asistente de IA (Claude Code) y luego simplificado a lo realmente necesario. Historia completa: [`docs/HOW_IT_WAS_MADE.md`](docs/HOW_IT_WAS_MADE.md) · arquitectura: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+Construido en una sesión de programación en pareja con un asistente de IA (Claude Code) y luego simplificado a lo realmente necesario. Historia completa: [`docs/HOW_IT_WAS_MADE.md`](docs/HOW_IT_WAS_MADE.md) · [`docs/USE_WITH_AI.md`](docs/USE_WITH_AI.md) · [`docs/FAQ.md`](docs/FAQ.md) · arquitectura: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 </details>
 
 <details>
 <summary><b>Uso gratuito · licencia · garantía</b></summary>
 
-Publicado bajo [licencia MIT](LICENSE): úsalo, cópialo, modifícalo, incluso comercialmente. **Se ofrece “tal cual”, sin garantía de ningún tipo**, y sin promesa de soporte ni mantenimiento más allá de lo que haga la automatización. Eres responsable del uso que hagas.
+Publicado bajo [licencia Apache 2.0](LICENSE) (ver [`NOTICE`](NOTICE) y [`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md)): úsalo, cópialo, modifícalo y redistribúyelo, incluso comercialmente, conservando los avisos. Frente a MIT añade una cesión explícita de patentes y deja claro que no concede derechos de marca, algo adecuado para una herramienta que menciona el producto de otra empresa. **Se ofrece “tal cual”, sin garantía de ningún tipo**, y sin promesa de soporte ni mantenimiento más allá de lo que haga la automatización. Eres responsable del uso que hagas.
 
 </details>
 
@@ -161,6 +168,7 @@ Publicado bajo [licencia MIT](LICENSE): úsalo, cópialo, modifícalo, incluso c
 - Úsalo **únicamente en cuentas de Frontify propias o con autorización expresa para exportarlas**. Solo accede a lo que tu token permite y no evita ningún permiso ni protección de descarga.
 - El contenido exportado (recursos de marca, guidelines, fuentes) pertenece a sus titulares: revisa contratos con clientes, licencias y datos personales antes de compartirlo o enviarlo a servicios de IA de terceros.
 - Mantén los tokens en secreto y revócalos cuando ya no los necesites.
+- Texto completo: [`DISCLAIMER.md`](DISCLAIMER.md) (ES/EN).
 
 </details>
 
@@ -174,4 +182,4 @@ Publicado bajo [licencia MIT](LICENSE): úsalo, cópialo, modifícalo, incluso c
 
 </details>
 
-<div align="center"><sub>Hecho para que cualquier IA entienda tu marca sin perder contexto. ✦ <a href="LICENSE">MIT</a></sub></div>
+<div align="center"><sub>Hecho para que cualquier IA entienda tu marca sin perder contexto. ✦ <a href="LICENSE">Apache-2.0</a> · <a href="DISCLAIMER.md">Aviso legal</a></sub></div>

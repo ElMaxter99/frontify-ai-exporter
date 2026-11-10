@@ -82,7 +82,7 @@ function say(t,k){$('msg').innerHTML=t?`<div class="msg ${k}">${esc(t)}</div>`:'
 async function post(path,b){const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:b?JSON.stringify(b):undefined});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.detail||r.statusText);return j}
 async function go(kind){say('');try{await post('/api/'+kind,body())}catch(e){say(e.message,'bad')}}
 $('analyze').onclick=()=>go('analyze');$('export').onclick=()=>go('export');
-$('cancel').onclick=()=>post('/api/cancel');$('open').onclick=async()=>{try{const j=await post('/api/open-folder');if(j.error)say(j.error,'bad')}catch(e){say(e.message,'bad')}};
+$('cancel').onclick=()=>post('/api/cancel');$('open').onclick=async()=>{try{const j=await post('/api/open-folder');if(j.error)say(j.error,'ok')}catch(e){say(e.message,'bad')}};
 $('pick').onclick=async()=>{const j=await post('/api/pick-folder');if(j.path)$('dest').value=j.path;else if(j.error)say(j.error,'bad')};
 function renderResult(r){
   if(!r){$('result').innerHTML='';return}
@@ -112,7 +112,7 @@ async function tick(){
   }catch(e){}
 }
 setInterval(tick,1000);tick();
-fetch('/api/config').then(r=>r.json()).then(c=>{$('dest').value=c.default_dest;if(c.default_url)$('url').value=c.default_url;
+fetch('/api/config').then(r=>r.json()).then(c=>{$('dest').value=c.locked?(c.host_dir||'./EXPORTS')+'  (Docker)':c.default_dest;if(c.locked)$('dest').disabled=true;if(c.default_url)$('url').value=c.default_url;
   $('tokenHint').textContent=c.has_env_token?'Hay un token en FRONTIFY_TOKEN: déjalo vacío para usarlo.':'El token solo se usa en memoria durante la exportación.';
   if(!c.can_pick_folder)$('pick').classList.add('hide')});
 </script>

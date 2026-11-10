@@ -2,7 +2,20 @@
 
 Herramienta **local** para exportar todo lo accesible de un Frontify a una carpeta organizada por cliente y lista para alimentar herramientas de IA. Sin base de datos, sin servicios externos, sin cuentas: una página local + el sistema de archivos (JSON y Markdown).
 
-## Uso
+## Uso con Docker (recomendado: funciona igual en Windows, macOS y Linux)
+
+```bash
+docker compose up --build
+```
+
+Abre <http://localhost:8765>, rellena URL y token, pulsa **EXPORTAR TODO**. Los resultados aparecen en la carpeta `./EXPORTS` junto al `docker-compose.yml` (en Linux, con tu usuario como propietario). El puerto solo se publica en `localhost`. Opcional: `FRONTIFY_URL` / `FRONTIFY_TOKEN` en el entorno o en un `.env` para pre-rellenar el formulario.
+
+En Docker el destino es siempre `./EXPORTS` (el selector de carpeta se desactiva) y "Abrir carpeta" te indica la ruta en vez de abrirla. Modo sin interfaz:
+`docker compose run --rm -e FRONTIFY_TOKEN=… frontify-exporter python -m src export --url https://cliente.frontify.com --dest /exports --name CLIENTE_01`
+
+> La imagen no se ha podido construir en el entorno de desarrollo (sin daemon de Docker); la lógica específica (destino bloqueado, entrypoint) está probada por separado.
+
+## Uso sin Docker
 
 ```bash
 python -m venv .venv && . .venv/bin/activate      # Windows: .venv\Scripts\activate

@@ -19,6 +19,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = ap.add_subparsers(dest="cmd")
     ui = sub.add_parser("ui", help="open the local interface (default)")
     ui.add_argument("--port", type=int, default=8765)
+    ui.add_argument("--host", default="127.0.0.1")
     ui.add_argument("--no-browser", action="store_true")
     for name in ("analyze", "export"):
         p = sub.add_parser(name)
@@ -34,7 +35,7 @@ def main(argv: list[str] | None = None) -> int:
         port = getattr(a, "port", 8765)
         if not getattr(a, "no_browser", False):
             threading.Timer(1.2, lambda: webbrowser.open(f"http://127.0.0.1:{port}")).start()
-        uvicorn.run("src.app:app_factory", factory=True, host="127.0.0.1", port=port, log_level="warning")
+        uvicorn.run("src.app:app_factory", factory=True, host=getattr(a, "host", "127.0.0.1"), port=port, log_level="warning")
         return 0
     setup_logging("INFO")
     ex = Exporter(a.url, a.token or os.getenv("FRONTIFY_TOKEN", ""), a.dest, client_name=a.name, concurrency=a.concurrency, progress=Progress())

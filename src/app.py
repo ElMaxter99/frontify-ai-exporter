@@ -41,7 +41,11 @@ def create_app(*, api_transport: httpx.AsyncBaseTransport | None = None, downloa
         t = state["task"]
         return t is not None and not t.done()
 
+    locked = bool(os.getenv("EXPORT_DIR_LOCKED"))  # Docker: always write to the mounted /exports
+
     def make(job: Job) -> Exporter:
+        if locked:
+            job.dest = os.getenv("EXPORT_DIR", "/exports")
         token = job.token.strip() or os.getenv("FRONTIFY_TOKEN", "")
         return Exporter(job.url, token, job.dest, client_name=job.name or None, concurrency=max(1, min(job.concurrency, 32)), progress=progress,
                         api_transport=api_transport, download_transport=download_transport, api_base_url=api_base_url)
@@ -63,7 +67,7 @@ def create_app(*, api_transport: httpx.AsyncBaseTransport | None = None, downloa
             raise HTTPException(409, "A job is already running")
         if not job.url.strip() or not (job.token.strip() or os.getenv("FRONTIFY_TOKEN")):
             raise HTTPException(400, "Enter the Frontify URL and the API token")
-        if not job.dest.strip():
+        if not job.dest.strip() and not locked:
             raise HTTPException(400, "Choose a destination folder")
         progress.reset()
         progress.running, progress.phase = True, "connecting"
@@ -77,7 +81,8 @@ def create_app(*, api_transport: httpx.AsyncBaseTransport | None = None, downloa
     @app.get("/api/config")
     def config() -> dict[str, Any]:
         return {"default_dest": str(Path(os.getenv("EXPORT_DIR", "EXPORTS")).resolve()), "has_env_token": bool(os.getenv("FRONTIFY_TOKEN")),
-                "default_url": os.getenv("FRONTIFY_URL", ""), "can_pick_folder": _can_pick()}
+                "default_url": os.getenv("FRONTIFY_URL", ""), "can_pick_folder": _can_pick() and not locked,
+                "locked": locked, "host_dir": os.getenv("HOST_EXPORT_DIR", "")}
 
     @app.post("/api/analyze")
     async def analyze(job: Job) -> dict[str, bool]:
@@ -114,6 +119,8 @@ def create_app(*, api_transport: httpx.AsyncBaseTransport | None = None, downloa
     @app.post("/api/open-folder")
     def open_folder() -> dict[str, Any]:
         folder = progress.folder
+        if locked:
+            return {"opened": None, "error": f"Docker: the export is in {os.getenv('HOST_EXPORT_DIR') or './EXPORTS'} on your computer ({folder} inside the container)."}
         if not folder or not Path(folder).exists():
             raise HTTPException(404, "Nothing exported yet")
         try:

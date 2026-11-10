@@ -45,3 +45,19 @@ def test_bad_token_reports_error(tmp_path):
         c.post("/api/export", json={"url": "acme.frontify.com", "token": "x" * 12, "dest": str(tmp_path)})
         s = wait(c)
         assert s["phase"] == "failed" and "rejected" in s["message"]
+
+
+def test_docker_locked_destination(tmp_path, monkeypatch):
+    fake = FakeFrontify()
+    monkeypatch.setenv("EXPORT_DIR_LOCKED", "1")
+    monkeypatch.setenv("EXPORT_DIR", str(tmp_path / "mounted"))
+    monkeypatch.setenv("HOST_EXPORT_DIR", "./EXPORTS")
+    app = create_app(api_transport=fake.transport, download_transport=fake.transport)
+    with TestClient(app) as c:
+        cfg = c.get("/api/config").json()
+        assert cfg["locked"] and not cfg["can_pick_folder"]
+        # whatever the browser sends, files only go to the mounted folder
+        assert c.post("/api/export", json={"url": "acme.frontify.com", "token": TOKEN, "dest": "/etc"}).status_code == 200
+        s = wait(c)
+        assert s["phase"] == "done" and s["folder"].startswith(str(tmp_path / "mounted"))
+        assert "./EXPORTS" in c.post("/api/open-folder").json()["error"]

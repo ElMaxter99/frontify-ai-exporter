@@ -2,6 +2,22 @@
 
 Herramienta **local** para exportar todo lo accesible de un Frontify a una carpeta organizada por cliente y lista para alimentar herramientas de IA. Sin base de datos, sin servicios externos, sin cuentas: una página local + el sistema de archivos (JSON y Markdown).
 
+## Un solo comando (sin interfaz, con Docker)
+
+Construye la imagen, exporta, deja todo en `./EXPORTS` y elimina el contenedor al terminar.
+
+```bash
+# macOS / Linux (o Git Bash / WSL en Windows)
+./export.sh --url https://cliente.frontify.com --token TU_TOKEN --name CLIENTE_01
+# o con variables de entorno / .env:  FRONTIFY_URL=... FRONTIFY_TOKEN=... ./export.sh
+```
+```powershell
+# Windows (PowerShell)
+.\export.ps1 -Url https://cliente.frontify.com -Token TU_TOKEN -Name CLIENTE_01
+```
+
+El token se pasa por entorno al contenedor (no queda en la línea de comandos del contenedor). Código de salida 0 = sin errores; distinto de 0 = hubo fallos (detalle en `EXPORT_REPORT.json`). Opciones: `--concurrency N` / `-Concurrency N`.
+
 ## Uso con Docker (recomendado: funciona igual en Windows, macOS y Linux)
 
 ```bash

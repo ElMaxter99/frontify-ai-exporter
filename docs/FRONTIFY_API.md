@@ -1,4 +1,4 @@
-# Investigación de la API de Frontify (Fase 1)
+# Investigación de la API de Frontify
 
 Fuentes: <https://developer.frontify.com/> y <https://frontify.github.io/graphql-reference/> (páginas consultadas el 2026‑11‑10; la referencia indicaba "Last updated 09‑11‑2026"). Nada de lo usado se ha inferido sin comprobarlo en la referencia, salvo lo marcado como **supuesto**.
 

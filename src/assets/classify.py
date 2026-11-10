@@ -13,8 +13,10 @@ FONT_EXT = {"ttf", "otf", "woff", "woff2", "eot"}
 
 _LOGO = re.compile(r"\blogo|logotype|wordmark|brandmark|emblem", re.IGNORECASE)
 _ICON = re.compile(r"\bicon|pictogram|glyph", re.IGNORECASE)
+_PHOTO = re.compile(r"photo|fotograf|imagery|picture|portrait", re.I)
+_ILLUS = re.compile(r"illustrat|ilustra|artwork", re.I)
 
-CATEGORIES = ["images", "logos", "icons", "videos", "audio", "documents", "fonts", "other"]
+CATEGORIES = ["logos", "images", "photography", "videos", "icons", "illustrations", "audio", "documents", "fonts", "other"]
 
 
 def _hint(text: str) -> str | None:
@@ -22,6 +24,10 @@ def _hint(text: str) -> str | None:
         return "logos"
     if _ICON.search(text):
         return "icons"
+    if _ILLUS.search(text):
+        return "illustrations"
+    if _PHOTO.search(text):
+        return "photography"
     return None
 
 

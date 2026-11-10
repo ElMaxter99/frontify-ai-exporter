@@ -1,4 +1,4 @@
-"""Logging with secret redaction and fan-out to the realtime event bus."""
+"""Logging with secret redaction (tokens, Bearer headers, signed-URL parameters)."""
 from __future__ import annotations
 
 import logging
@@ -36,20 +36,6 @@ class RedactingFilter(logging.Filter):
         return True
 
 
-class BusHandler(logging.Handler):
-    """Mirrors log records into the EventBus so the UI can tail them."""
-
-    def __init__(self, bus) -> None:
-        super().__init__(level=logging.INFO)
-        self.bus = bus
-
-    def emit(self, record: logging.LogRecord) -> None:
-        try:
-            self.bus.publish("log", {"level": record.levelname, "logger": record.name, "message": record.getMessage()})
-        except Exception:  # pragma: no cover
-            pass
-
-
 def setup_logging(level: str = "INFO", bus=None) -> None:
     root = logging.getLogger()
     root.setLevel(level.upper())
@@ -61,10 +47,5 @@ def setup_logging(level: str = "INFO", bus=None) -> None:
     stream._fae = True  # type: ignore[attr-defined]
     stream.addFilter(RedactingFilter())
     root.addHandler(stream)
-    if bus is not None:
-        bh = BusHandler(bus)
-        bh._fae = True  # type: ignore[attr-defined]
-        bh.addFilter(RedactingFilter())
-        root.addHandler(bh)
     for noisy in ("httpx", "httpcore"):
         logging.getLogger(noisy).setLevel(logging.WARNING)

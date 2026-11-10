@@ -76,3 +76,11 @@ def render_library_page(meta: dict[str, Any], assets: list[dict[str, Any]], *, b
         desc = f": {a['description']}" if a.get("description") else ""
         parts.append(f"- **{a.get('title')}** (Frontify asset `{a['id']}`){rel}{desc}")
     return "\n".join(parts).rstrip() + "\n"
+
+
+def strip_front_matter(md: str) -> str:
+    if md.startswith("---\n"):
+        end = md.find("\n---", 4)
+        if end != -1:
+            return md[end + 4:].lstrip("\n")
+    return md

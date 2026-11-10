@@ -141,6 +141,9 @@ class FakeFrontify:
         return httpx.Response(200, content=data)
 
     # ------------------------------------------------------------- operations
+    def op_Caps(self, v):
+        return {"__schema": {"queryType": {"fields": [{"name": n} for n in ("brands", "brand", "library", "assets", "node", "guidelinePage")]}}}
+
     def op_CurrentUser(self, v):
         return {"currentUser": {"id": "u1", "name": "Jane"}}
 

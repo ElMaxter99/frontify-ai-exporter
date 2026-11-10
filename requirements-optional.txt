@@ -1,6 +1,0 @@
-# Install only what you need (see docs/AI_KNOWLEDGE.md)
-sentence-transformers>=3.0   # local embeddings
-chromadb>=0.5                # ChromaDB vector store
-faiss-cpu>=1.8               # FAISS vector store
-qdrant-client>=1.9           # Qdrant vector store
-pytesseract>=0.3             # OCR (needs the tesseract binary)

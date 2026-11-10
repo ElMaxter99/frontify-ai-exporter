@@ -1,103 +1,63 @@
-# Frontify AI Exporter
+# Frontify Exporter
 
-Conecta con tu instancia de **Frontify** (API GraphQL oficial), descubre todo lo que tu token puede ver, **descarga los archivos originales**, exporta las **brand guidelines a Markdown**, conserva **todos los metadatos** y genera una **base de conocimiento lista para IA** (ChatGPT, Claude, Cursor, Codex, agentes) con chunks con procedencia, búsqueda léxica/semántica y soporte para ChromaDB, FAISS, Qdrant y embeddings de OpenAI o locales.
+Herramienta **local** para exportar todo lo accesible de un Frontify a una carpeta organizada por cliente y lista para alimentar herramientas de IA. Sin base de datos, sin servicios externos, sin cuentas: una página local + el sistema de archivos (JSON y Markdown).
 
-Principio rector: **no perder información** y **nunca sustituir un original por una versión procesada**. Todo lo derivado (Markdown, texto extraído, chunks) vive en `knowledge/` o `guidelines/markdown/` y referencia el original.
-
-## Arranque rápido
+## Uso
 
 ```bash
-cp .env.example .env        # rellena FRONTIFY_DOMAIN y FRONTIFY_TOKEN
-docker compose up --build
-```
-
-Abre <http://localhost:8000> → **Dashboard** (estado de conexión) → **Export** → *Scan Frontify* → *Export*.
-El resultado queda en `./exports` (volumen del host).
-
-> Nota de verificación: la imagen Docker no pudo construirse en el entorno de desarrollo (sin daemon de Docker). El backend, el frontend y el arranque con `python -m src.cli serve` sí se ejecutaron y probaron; ver [Estado y limitaciones](#estado-y-limitaciones).
-
-### Sin Docker
-
-```bash
-python -m venv .venv && . .venv/bin/activate
+python -m venv .venv && . .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-(cd frontend && npm install && npm run build)     # UI compilada en frontend/dist
-python -m src.cli serve --port 8000
+python -m src                                      # abre http://127.0.0.1:8765
 ```
 
-Desarrollo de la UI con recarga: `python -m src.cli serve` + `cd frontend && npm run dev` (proxy a :8000).
+1. Introduce la **URL de Frontify** y el **API token** (token personal o access token OAuth2 con acceso de lectura).
+2. Elige la **carpeta de destino** (y, opcionalmente, el nombre de la carpeta del cliente; por defecto el subdominio).
+3. **ANALIZAR FRONTIFY** (opcional, no escribe nada): cuenta marcas, librerías, carpetas, archivos y páginas, y avisa de zonas no accesibles.
+4. **EXPORTAR TODO**: descarga los originales, exporta guidelines y metadatos y genera los documentos para IA.
+5. **Abrir carpeta exportada** al terminar. El detalle de lo exportado y de lo fallido está en `EXPORT_REPORT.json`.
 
-### CLI
+También sin interfaz: `FRONTIFY_TOKEN=… python -m src export --url https://cliente.frontify.com --dest EXPORTS --name CLIENTE_01`.
+
+El token solo se mantiene en memoria durante la ejecución (o se lee de `FRONTIFY_TOKEN`); nunca se guarda en disco, no se devuelve al navegador y se redacta de los logs. La UI escucha solo en `127.0.0.1`.
+
+## Carpeta resultante
+
+```
+EXPORTS/CLIENTE_01/
+├── README_AI.md                  # cómo navegar la exportación (para humanos e IA)
+├── EXPORT_REPORT.json            # totales, no exportados + motivo, inaccesibles, duplicados, limitaciones
+├── manifest.json                 # todos los ficheros con tamaño y SHA-256
+├── export.log
+├── 01_BRAND_GUIDELINES/<marca>/  # una página .md por página de guideline (jerarquía de Frontify); _original/ JSON crudo; _media/
+├── 02_ASSETS/{LOGOS,IMAGES,PHOTOGRAPHY,VIDEOS,ICONS,ILLUSTRATIONS,AUDIO,OTHER}/<marca>/<librería>/<carpetas…>/<original>
+├── 03_DOCUMENTATION/<marca>/…    # PDF/DOCX/… originales + _extracted_text/
+├── 04_DESIGN_SYSTEM/             # fuentes descargables + Brand Essentials (JSON)
+├── 05_METADATA/<marca>/          # assets.json, folders.json, projects.json, relationships.json, essentials.json
+└── 06_AI_KNOWLEDGE/              # BRAND_OVERVIEW, VISUAL_IDENTITY, BRAND_GUIDELINES, ASSET_INDEX, DESIGN_SYSTEM, CONTENT_INDEX (.md)
+```
+
+Solo se crean las carpetas/categorías con contenido real. **La relación con Frontify nunca se pierde**: la ruta original (librería/carpeta/ID) de cada archivo está en `05_METADATA/<marca>/assets.json` y en `ASSET_INDEX.md`; los `.md` de guidelines llevan URL e ID en su front-matter. Los documentos de `06_AI_KNOWLEDGE` se generan solo con datos devueltos por la API; lo que falta se indica como *Not available*. Los originales nunca se sustituyen por resúmenes.
+
+## Fiabilidad
+
+* Paginación completa; descargas concurrentes configurables; reintentos con backoff (429/5xx/red, respeta `Retry-After`).
+* URLs de descarga firmadas pedidas justo antes de descargar; el token no se envía al CDN; **nunca** se sustituye un original por un preview (si no hay original: `unavailable` en el informe).
+* Verificación de tamaño y SHA-256; duplicados detectados (se conservan ambos, se anotan en el informe).
+* **Reanudación**: `.export_state.json` en la carpeta del cliente + descargas parciales `.part` con HTTP Range. Volver a pulsar *Exportar* continúa y **no re-descarga lo que no cambió** (huella `modifiedAt`/tamaño/nombre, comprobando el fichero en disco). Si un archivo cambió en Frontify, la versión anterior se conserva en `_previous_versions/`.
+* Un fallo individual nunca detiene la exportación. Si un contenedor no se puede recorrer completo (permisos), se informa (`scan_errors`, comparando con `assets.total` de Frontify).
+
+## Limitaciones reales de la API (documentadas en cada informe)
+
+* **Design tokens y componentes**: la API GraphQL oficial no ofrece consultas para ellos (el análisis lo comprueba con introspección cuando está activa). `DESIGN_SYSTEM.md` usa Brand Essentials (colores, tipografías) y las páginas de guidelines de diseño.
+* Sin PDF de guidelines (Markdown + JSON); los assets dentro de bloques solo exponen `previewUrl`; el `content` de algunos bloques es nulo (se conservan sus `settings` crudos).
+* Logos/fotografía/iconos/ilustraciones se clasifican por nombre/carpeta (no hay flag en la API).
+* No se exportan variantes, revisiones, comentarios, licencias ni workflows.
+* Detalle de consultas y campos verificados: [docs/FRONTIFY_API.md](docs/FRONTIFY_API.md).
+
+## Estado de verificación (honestidad)
+
+Las consultas se escribieron campo a campo contra la [referencia oficial](https://frontify.github.io/graphql-reference/) y los 20 tests (cliente, exportación completa, reintentos, reanudación, cambios, UI/API) corren contra un **Frontify simulado en proceso** (`tests/fake_frontify.py`). **No se ha probado contra una instancia real de Frontify** (no hay credenciales en este entorno): el criterio "conectar una instancia real" queda pendiente de tu primera ejecución. Hay degradación controlada si una instancia rechaza un campo opcional, y todo error de acceso queda en el informe en lugar de ocultarse. Prueba la UI sin credenciales con `python -m tests.serve_fake`.
 
 ```bash
-python -m src.cli scan                       # solo descubrimiento
-python -m src.cli export                     # escaneo + descarga + guidelines + conocimiento + índice (incremental)
-python -m src.cli export --force             # re-descarga todo
-python -m src.cli export --brand <id> --category documents --category logos
-python -m src.cli search "espacio de seguridad del logo" -k 5
+pip install -r requirements-dev.txt && pytest && ruff check src tests && mypy src
 ```
-
-## Credenciales y seguridad
-
-* El token **solo** viaja por variable de entorno (`FRONTIFY_TOKEN`) o, opcionalmente, se teclea en *Settings* y vive **solo en memoria del servidor** (no se persiste, no se devuelve al navegador, no hay token en el frontend).
-* Los logs redactan el token, cabeceras `Bearer` y parámetros de firma de URLs. Las `downloadUrl` firmadas se piden justo antes de descargar, se usan con un cliente HTTP **sin** cabecera de autorización (el token no viaja a CDNs) y **no se guardan** en los JSON exportados.
-* Solo se accede a lo que el token autoriza; un asset protegido contra descarga se marca `unavailable` y no se sustituye por un preview.
-
-## Estructura de la exportación
-
-```
-exports/
-├── manifest.json                     # versión, totales, hashes de los ficheros de conocimiento
-├── global/{inventory.json, export_report.json}
-└── brands/<marca>/
-    ├── assets/{images,logos,icons,videos,audio,documents,fonts,other}/<librería>/<carpetas…>/<original>
-    ├── guidelines/
-    │   ├── markdown/   # una página .md por página de guideline, jerarquía de navegación y front-matter con procedencia
-    │   ├── original/   # JSON crudo de la API, navigation.json, media/ (previews embebidos)
-    │   └── pdf/        # README: la API no expone PDF de guidelines (ver limitaciones)
-    ├── libraries/      # (reservado; las librerías son el primer nivel bajo assets/<categoría>/)
-    ├── metadata/{assets,folders,projects,relationships,essentials}.json
-    └── knowledge/{brand_context,brand_guidelines,visual_identity,typography,colors,tone_of_voice,complete_index}.md
-                  chunks.jsonl, extracted_text/
-```
-
-La estructura se genera dinámicamente según las marcas/librerías/carpetas encontradas. Los ficheros de `knowledge/` se construyen solo con datos reales; si Frontify no tiene datos de un tema, el fichero lo dice explícitamente.
-
-## Sincronización incremental
-
-Cada escaneo compara con la base SQLite (`data/exporter.sqlite3`) y registra en el histórico (`sync_runs`/`changes`) assets **nuevos, modificados, restaurados y eliminados/inaccesibles**, carpetas y páginas de guidelines nuevas/cambiadas y cambios de contenido de documentación (hash del contenido).
-
-* Un asset **no se vuelve a descargar** salvo que cambie `modifiedAt`/`fileCreatedAt`/tamaño/nombre de fichero (los cambios solo de metadatos actualizan metadatos sin re-descargar). Cada descarga se verifica con SHA-256 y tamaño; se detectan duplicados por hash (opcional: hard links).
-* Un asset solo se declara eliminado si el contenedor se recorrió **completo** y su total coincide con `assets.total` de Frontify; ante un escaneo incompleto no se borra nada.
-* **Reanudación**: el estado es por asset en SQLite y las descargas parciales (`.part`) se retoman con HTTP Range. Relanzar *Export* continúa donde se quedó. Un fallo individual nunca detiene la exportación y aparece en el informe final.
-
-## Preparación para IA
-
-Ver [docs/AI_KNOWLEDGE.md](docs/AI_KNOWLEDGE.md). Resumen: chunking por encabezados con migas de pan, procedencia en cada chunk (marca, fichero origen, ID Frontify, URL, categoría, carpeta, fecha de extracción), extracción de texto de PDF/DOCX/TXT/MD/HTML/CSV/JSON/SVG, OCR opcional, metadatos de imagen (EXIF), índice léxico FTS5 siempre disponible, embeddings opcionales (OpenAI/local) y vector store SQLite/Chroma/FAISS/Qdrant.
-
-## Tests
-
-```bash
-pip install -r requirements-dev.txt
-pytest            # 22 tests: cliente (reintentos, 429, auth, errores parciales), unidades, integración end-to-end, API
-ruff check src tests && mypy src
-cd frontend && npm run build   # tsc + vite
-```
-
-Los tests de integración usan un **Frontify simulado en proceso** (`tests/fake_frontify.py`, `httpx.MockTransport`) cuyo esquema sigue la referencia oficial. `python -m tests.serve_fake` levanta la app real contra ese simulador (sin red ni credenciales) para probar la UI.
-
-## Estado y limitaciones
-
-**Importante — no validado contra una instancia real de Frontify**: este entorno no dispone de credenciales de Frontify. Las consultas se construyeron campo a campo contra la [referencia GraphQL oficial](https://frontify.github.io/graphql-reference/) y se probaron contra el simulador, pero conviene hacer una primera ejecución real. Para ello hay degradación controlada: si la instancia rechaza un campo opcional del asset, el escáner baja a una consulta mínima y lo registra; las queries de guidelines/essentials (Beta) fallan de forma aislada y quedan reflejadas en el informe sin detener el resto.
-
-Limitaciones conocidas (detalle en [docs/FRONTIFY_API.md](docs/FRONTIFY_API.md)):
-
-* La API GraphQL no expone un **PDF de guidelines** → se exporta Markdown + JSON original; los PDF que existan como assets sí se descargan.
-* Los assets referenciados dentro de bloques de guidelines solo exponen `previewUrl` (sin ID): se guardan esos previews y los originales se obtienen del recorrido de librerías.
-* `content` de un bloque puede ser `null` para algunos tipos: entonces se conservan sus `settings` crudos en el Markdown y el JSON.
-* El tipo `Asset` no tiene permalink: la procedencia usa ID de Frontify + dominio (y URL de la guideline/página cuando existe).
-* Logos/iconos se clasifican por heurística de nombre/carpeta (no hay flag en la API). Variantes de assets, revisiones, comentarios, licencias y workflows **no** se exportan todavía.
-* Autenticación: se usa `Authorization: Bearer` con un token personal o un access token OAuth 2.0 obtenido fuera de la app; el flujo interactivo de OAuth no está implementado.
-* Límites de peticiones: se respetan 429/`Retry-After` con backoff exponencial y concurrencia configurable; los umbrales exactos de Frontify no figuran en la referencia consultada.
-
-Más documentación: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).

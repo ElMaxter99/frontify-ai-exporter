@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Text and metadata extraction from downloaded originals. Originals are only READ, never modified."""
 from __future__ import annotations
 

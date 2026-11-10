@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Concurrent, resumable, integrity-checked download of ORIGINAL files.
 
 * Fresh signed ``downloadUrl`` per batch (they expire). Previews/thumbnails are never used as substitutes.

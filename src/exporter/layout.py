@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Client folder layout (01_ … 06_) and persisted resume state (a single JSON file)."""
 from __future__ import annotations
 

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Logging with secret redaction (tokens, Bearer headers, signed-URL parameters)."""
 from __future__ import annotations
 

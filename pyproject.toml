@@ -4,11 +4,11 @@ version = "1.0.0"
 description = "Local tool: export everything accessible in a Frontify instance to an organised, AI-ready folder"
 requires-python = ">=3.11"
 readme = "README.md"
-license = { text = "MIT" }
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
 authors = [{ name = "ElMaxter99" }]
 keywords = ["frontify", "export", "brand-guidelines", "dam", "ai", "knowledge-base"]
 classifiers = [
-  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Operating System :: OS Independent",
   "Intended Audience :: Developers",

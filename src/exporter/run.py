@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Orchestration: analyze (read-only) and export (full)."""
 from __future__ import annotations
 

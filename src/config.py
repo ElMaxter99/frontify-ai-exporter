@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Tiny helpers. No settings framework: the URL, token and folder come from the UI/CLI (token may also come from FRONTIFY_TOKEN)."""
 from __future__ import annotations
 

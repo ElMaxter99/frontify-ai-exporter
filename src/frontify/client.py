@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Single entry point for every request made to Frontify.
 
 * GraphQL endpoint: ``https://<domain>/graphql`` (official Frontify GraphQL API)

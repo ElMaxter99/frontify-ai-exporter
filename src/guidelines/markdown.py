@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Convert a fetched guideline page (sections/elements) into Markdown. Pure functions, no I/O."""
 from __future__ import annotations
 

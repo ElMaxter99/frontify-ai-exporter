@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Export every guideline page: Markdown (hierarchy kept) + raw API JSON + embedded previews."""
 from __future__ import annotations
 

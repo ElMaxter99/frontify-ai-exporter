@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """05_METADATA and 06_AI_KNOWLEDGE + README_AI.md, written ONLY from data actually returned by Frontify."""
 from __future__ import annotations
 

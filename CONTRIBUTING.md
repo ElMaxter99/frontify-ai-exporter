@@ -11,6 +11,9 @@ pytest && ruff check src tests && mypy src      # must be green / debe estar en 
 python -m tests.serve_fake                        # UI against a fake Frontify (token: test-token-123456)
 ```
 
+## License of contributions / Licencia de las contribuciones
+By submitting a contribution you agree it is licensed under the [Apache License 2.0](LICENSE) (section 5). New Python files start with `# SPDX-License-Identifier: Apache-2.0`. / Al contribuir aceptas que tu aportación se licencie bajo Apache 2.0 (sección 5); los nuevos `.py` empiezan con la línea SPDX.
+
 ## Rules / Reglas
 - **Never** commit tokens, exports (`EXPORTS/`) or customer data. / **Nunca** subas tokens, exportaciones ni datos de clientes.
 - Only use fields/queries that exist in the [official GraphQL reference](https://frontify.github.io/graphql-reference/); cite them in `docs/FRONTIFY_API.md`. / Solo campos de la referencia oficial.

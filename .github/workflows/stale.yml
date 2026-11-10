@@ -1,0 +1,22 @@
+name: Stale
+on:
+  schedule:
+    - cron: "30 5 * * *"
+permissions:
+  issues: write
+  pull-requests: write
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-stale: 60
+          days-before-close: 14
+          stale-issue-label: stale
+          stale-pr-label: stale
+          exempt-issue-labels: pinned,security,help wanted
+          stale-issue-message: >
+            No activity for 60 days. It will be closed in 14 days unless there is an update. / Sin actividad en 60 días; se cerrará en 14 salvo novedades.
+          stale-pr-message: >
+            No activity for 60 days. It will be closed in 14 days unless there is an update. / Sin actividad en 60 días; se cerrará en 14 salvo novedades.

@@ -1,0 +1,35 @@
+name: "Bug report / Error"
+description: "Something does not work / Algo no funciona"
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "**Never paste tokens or customer data. / No pegues tokens ni datos de clientes.** Redact URLs if needed."
+  - type: textarea
+    id: what
+    attributes:
+      label: "What happened? / ¿Qué pasó?"
+      description: "Expected vs actual / Esperado vs real"
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: "Relevant part of EXPORT_REPORT.json / export.log"
+      description: "Only the failing entries, with secrets removed. / Solo las entradas con fallo, sin secretos."
+      render: json
+  - type: dropdown
+    id: how
+    attributes:
+      label: "How do you run it? / ¿Cómo lo ejecutas?"
+      options:
+        - "Docker script (export.sh / export.ps1)"
+        - "Docker compose UI"
+        - "Python UI"
+        - "Python CLI"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: "OS and Docker/Python version / SO y versión"

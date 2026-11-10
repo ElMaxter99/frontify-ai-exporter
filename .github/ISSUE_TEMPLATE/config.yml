@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability / Vulnerabilidad
+    url: https://github.com/ElMaxter99/frontify-ai-exporter/security/advisories/new
+    about: Please report privately. / Por favor, repórtalo en privado.

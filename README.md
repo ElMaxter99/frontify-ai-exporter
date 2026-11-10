@@ -2,170 +2,176 @@
 
 <img src="docs/assets/logo.svg" alt="Frontify Exporter" width="720">
 
-<br>
+**Export everything accessible in a Frontify to a clean local folder, ready to feed your AI.**
 
-**Exporta todo lo accesible de un Frontify a una carpeta local impecable, lista para alimentar a tu IA.**
+🇬🇧 **English** · [🇪🇸 Español](README.es.md)
 
-![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-listo-2496ED?logo=docker&logoColor=white)
-![Local](https://img.shields.io/badge/100%25-local-d4af37)
-![Tests](https://img.shields.io/badge/tests-21%20passing-12805c)
-![Sin base de datos](https://img.shields.io/badge/BD-ninguna-8a8fa8)
+[![CI](https://github.com/ElMaxter99/frontify-ai-exporter/actions/workflows/ci.yml/badge.svg)](https://github.com/ElMaxter99/frontify-ai-exporter/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/ElMaxter99/frontify-ai-exporter/actions/workflows/codeql.yml/badge.svg)](https://github.com/ElMaxter99/frontify-ai-exporter/actions/workflows/codeql.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-d4af37.svg)](LICENSE)
+![Python](https://img.shields.io/badge/Python-3.11%E2%80%933.13-3776AB?logo=python&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)
+![Dependabot](https://img.shields.io/badge/Dependabot-enabled-025E8C?logo=dependabot&logoColor=white)
+![Free](https://img.shields.io/badge/price-free-12805c)
 
-[⚡ Inicio rápido](#-inicio-rápido) · [🗂 La carpeta resultante](#-la-carpeta-resultante) · [🛡 Fiabilidad](#-fiabilidad) · [🧠 Para IA](#-pensado-para-ia) · [⚠️ Límites reales](#️-límites-reales-de-la-api)
+[Quick start](#-quick-start) · [Output](#-the-output-folder) · [For AI](#-built-for-ai) · [Reliability](#-reliability) · [Limits](#️-real-api-limits) · [Project](#-about-this-project)
 
 </div>
 
 ---
 
-## ✨ ¿Qué hace?
+> 🪧 **The honest pitch:** two small scripts I wrote to export a client's Frontify to a folder. They might be useful to you too, so here they are — free, MIT-licensed, no support promises. Use them, fork them, improve them.
 
-Introduces la **URL**, el **token** y pulsas **EXPORTAR TODO**. La herramienta:
+## ✨ What it does
+
+Enter the **URL** and an **API token**, hit **EXPORT**. It:
 
 | | |
 |---|---|
-| 🔎 **Analiza** | marcas, workspaces, librerías, colecciones, carpetas y subcarpetas, guidelines y sus páginas |
-| 📥 **Descarga** | los **archivos originales** (nunca previews): logos, imágenes, vídeos, PDFs, fuentes, documentos… |
-| 📝 **Exporta** | guidelines a **Markdown** (con su jerarquía), textos, descripciones, etiquetas y **todos los metadatos** |
-| 🔗 **Conserva** | la ubicación original de cada archivo en Frontify y las relaciones entre recursos |
-| 🧠 **Genera** | documentos de contexto para IA, escritos **solo con datos reales** (sin inventar nada) |
-| 📊 **Informa** | de lo exportado, lo omitido y lo que falló, con el motivo de cada caso |
+| 🔎 **Analyzes** | brands, workspaces, libraries, collections, folders, guidelines and their pages |
+| 📥 **Downloads** | the **original files** (never previews): logos, images, videos, PDFs, fonts, documents… |
+| 📝 **Exports** | guidelines to **Markdown** (hierarchy kept), texts, descriptions, tags and **all metadata** |
+| 🔗 **Keeps** | each file's original location in Frontify and the relations between resources |
+| 🧠 **Generates** | AI context documents written **only from real data** (nothing invented) |
+| 📊 **Reports** | what was exported, skipped or failed — with the reason for each |
 
-> Una app local y sencilla: **sin SaaS, sin cuentas, sin base de datos, sin servicios externos**. Solo sistema de archivos, JSON y Markdown.
+100 % local: **no SaaS, no accounts, no database, no external services.** Just the file system, JSON and Markdown.
 
----
+## ⚡ Quick start
 
-## ⚡ Inicio rápido
+You need a Frontify URL (`https://client.frontify.com`) and an **API token** with read access to the content you want.
 
-Elige tu estilo. Todos producen la misma carpeta.
+<details open>
+<summary><b>🐳 Docker — one command, no UI</b> (macOS · Linux · Windows)</summary>
 
-### 🐳 Opción 1 · Un comando, sin interfaz *(Docker)*
-
-Construye, exporta, deja todo en `./EXPORTS` y **cierra el contenedor** al terminar.
+Builds, exports into `./EXPORTS`, and removes the container when done.
 
 ```bash
-# macOS / Linux (o Git Bash / WSL en Windows)
-./export.sh --url https://cliente.frontify.com --token TU_TOKEN --name CLIENTE_01
+# macOS / Linux (or Git Bash / WSL on Windows)
+./export.sh --url https://client.frontify.com --token YOUR_TOKEN --name CLIENT_01
 ```
-
 ```powershell
 # Windows (PowerShell)
-.\export.ps1 -Url https://cliente.frontify.com -Token TU_TOKEN -Name CLIENTE_01
+.\export.ps1 -Url https://client.frontify.com -Token YOUR_TOKEN -Name CLIENT_01
 ```
 
-<details>
-<summary>Más detalles de los scripts</summary>
-
-- Token y URL por **parámetro**, por **variables de entorno** (`FRONTIFY_TOKEN`, `FRONTIFY_URL`) o en un **`.env`** junto al script.
-- `--concurrency N` / `-Concurrency N`: descargas en paralelo (4 por defecto).
-- El token viaja al contenedor por entorno, no por la línea de comandos.
-- Código de salida `0` = sin errores · distinto de `0` = hubo fallos (ver `EXPORT_REPORT.json`).
-- Si Windows bloquea el script: `powershell -ExecutionPolicy Bypass -File .\export.ps1 -Url … -Token …`
+Token/URL can also come from `FRONTIFY_TOKEN` / `FRONTIFY_URL` env vars or a `.env` file. `--concurrency N` sets parallel downloads (default 4). Exit code `0` = no errors. If Windows blocks the script: `powershell -ExecutionPolicy Bypass -File .\export.ps1 …`
 
 </details>
 
-### 🖥 Opción 2 · Con interfaz web *(Docker)*
+<details>
+<summary><b>🖥 Docker — with the web UI</b></summary>
 
 ```bash
 docker compose up --build
 ```
+Open **http://localhost:8765** → URL + token → **ANALYZE** → **EXPORT ALL**. Results land in `./EXPORTS`. The port is bound to `localhost` only.
 
-Abre **http://localhost:8765** → URL + token → **ANALIZAR FRONTIFY** → **EXPORTAR TODO**.
-Resultados en `./EXPORTS`. El puerto solo escucha en `localhost`.
+</details>
 
-### 🐍 Opción 3 · Sin Docker
+<details>
+<summary><b>🐍 Python — no Docker</b></summary>
 
 ```bash
 python -m venv .venv && . .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python -m src                                      # abre la interfaz en http://127.0.0.1:8765
-# o sin interfaz:
-FRONTIFY_TOKEN=… python -m src export --url https://cliente.frontify.com --dest EXPORTS --name CLIENTE_01
+python -m src                                      # UI at http://127.0.0.1:8765
+# headless:
+FRONTIFY_TOKEN=… python -m src export --url https://client.frontify.com --dest EXPORTS --name CLIENT_01
 ```
 
----
+</details>
 
-## 🗂 La carpeta resultante
+## 🗂 The output folder
 
-Cada cliente tiene su propia carpeta, organizada automáticamente según lo que se encuentre (solo se crean las categorías con contenido).
+One folder per client, organised automatically (only categories with content are created):
 
 ```
-EXPORTS/CLIENTE_01/
-├── 📘 README_AI.md              ← por dónde empezar (humanos e IA)
-├── 📊 EXPORT_REPORT.json        ← totales, errores y motivos, recursos inaccesibles
-├── 🔐 manifest.json             ← cada fichero con tamaño y SHA-256
-├── 01_BRAND_GUIDELINES/<marca>/ ← una página .md por página de guideline + _original/ + _media/
+EXPORTS/CLIENT_01/
+├── 📘 README_AI.md              ← where to start (humans & AI)
+├── 📊 EXPORT_REPORT.json        ← totals, errors + reasons, inaccessible resources
+├── 🔐 manifest.json             ← every file with size and SHA-256
+├── 01_BRAND_GUIDELINES/<brand>/ ← one .md per guideline page + _original/ + _media/
 ├── 02_ASSETS/
 │   ├── LOGOS/ IMAGES/ PHOTOGRAPHY/ VIDEOS/ ICONS/ ILLUSTRATIONS/ AUDIO/ OTHER/
-│   └── …/<marca>/<librería>/<carpetas originales…>/<archivo original>
+│   └── …/<brand>/<library>/<original folders…>/<original file>
 ├── 03_DOCUMENTATION/            ← PDFs, DOCX… + _extracted_text/
-├── 04_DESIGN_SYSTEM/            ← fuentes descargables + Brand Essentials (JSON)
-├── 05_METADATA/<marca>/         ← assets · folders · projects · relationships · essentials (JSON)
-└── 06_AI_KNOWLEDGE/             ← los documentos para IA 👇
+├── 04_DESIGN_SYSTEM/            ← downloadable fonts + Brand Essentials (JSON)
+├── 05_METADATA/<brand>/         ← assets · folders · projects · relationships · essentials (JSON)
+└── 06_AI_KNOWLEDGE/             ← the AI documents 👇
 ```
 
-> 🔗 **Nunca se pierde la relación con Frontify**: la ruta original (librería / carpeta / ID) de cada archivo está en `05_METADATA/<marca>/assets.json` y en `ASSET_INDEX.md`.
+🔗 **The link to Frontify is never lost:** each file's original path (library / folder / ID) is in `05_METADATA/<brand>/assets.json` and `ASSET_INDEX.md`.
 
----
+## 🧠 Built for AI
 
-## 🧠 Pensado para IA
+`06_AI_KNOWLEDGE/` is generated from real API data:
 
-En `06_AI_KNOWLEDGE/` encontrarás, generados a partir de datos reales de la API:
-
-| Documento | Contenido |
+| Document | Content |
 |---|---|
-| `BRAND_OVERVIEW.md` | Resumen de la marca: librerías, colecciones, guidelines, totales |
-| `VISUAL_IDENTITY.md` | Logotipos, **colores** (HEX/Pantone) y **tipografías** |
-| `BRAND_GUIDELINES.md` | Todas las guidelines en Markdown, en el orden de Frontify |
-| `ASSET_INDEX.md` | Índice de recursos con nombre, descripción, etiquetas y ruta al original |
-| `DESIGN_SYSTEM.md` | Colores, tipografías y documentación de diseño disponible |
-| `CONTENT_INDEX.md` | Índice de todo lo exportado, con estado de cada documento |
+| `BRAND_OVERVIEW.md` | Brand summary: libraries, collections, guidelines, totals |
+| `VISUAL_IDENTITY.md` | Logos, **colors** (HEX/Pantone) and **typography** |
+| `BRAND_GUIDELINES.md` | All guidelines in Markdown, in Frontify order |
+| `ASSET_INDEX.md` | Resource index: name, description, tags, path to the original |
+| `DESIGN_SYSTEM.md` | Colors, fonts and available design documentation |
+| `CONTENT_INDEX.md` | Index of everything exported, with each document's status |
 
-**Reglas de oro:** los originales jamás se sustituyen por resúmenes · si un dato no existe, el documento dice *“Not available”* en lugar de inventarlo · todo lleva su fuente (URL / ID de Frontify).
+**Golden rules:** originals are never replaced by summaries · missing data reads *"Not available"* instead of being invented · everything carries its source (Frontify URL / ID).
 
----
+## 🛡 Reliability
 
-## 🛡 Fiabilidad
+- ♻️ **Resumable** — re-run and it continues; partial downloads resume (HTTP Range).
+- 🧬 **Incremental** — unchanged files aren't downloaded again; if a file changed, the old version is kept in `_previous_versions/`.
+- ✅ **Integrity** — size + SHA-256 per file; **duplicates** detected (kept and reported).
+- 🚦 **Resilient** — full pagination, retries with backoff (429/5xx/network), configurable concurrency. **One failure never stops the rest.**
+- 🔒 **Safe** — the token lives in memory or your environment, is redacted from logs and never sent to the CDN. The UI listens on `127.0.0.1` only. Frontify permissions are respected.
 
-```mermaid
-flowchart LR
-  A[Analizar] --> B[Descargar originales]
-  B --> C[Exportar guidelines]
-  C --> D[Extraer texto de documentos]
-  D --> E[Metadatos + docs para IA]
-  E --> F[Informe + manifest]
-```
+## ⚠️ Real API limits
 
-- ♻️ **Reanudable**: relanza y continúa; las descargas parciales se retoman (HTTP Range).
-- 🧬 **Incremental**: no vuelve a bajar lo que no cambió; si un archivo cambió, la versión anterior se conserva en `_previous_versions/`.
-- ✅ **Integridad**: tamaño + SHA-256 por archivo; **duplicados** detectados (se conservan y se anotan).
-- 🚦 **Resiliente**: paginación completa, reintentos con backoff (429/5xx/red) y concurrencia configurable. **Un fallo nunca detiene el resto.**
-- 🔒 **Seguro**: el token solo vive en memoria o en tu entorno, se oculta de los logs y nunca va al CDN. La interfaz solo escucha en `127.0.0.1`. Se respetan los permisos de Frontify.
+Also listed in every `EXPORT_REPORT.json`:
 
----
+- 🎨 **Design tokens & components** — not offered by Frontify's public GraphQL API. `DESIGN_SYSTEM.md` uses Brand Essentials (colors, fonts) and guideline pages.
+- 📄 **Guideline PDF** — doesn't exist in the API → Markdown + original JSON (PDFs that are *assets* are downloaded).
+- 🖼 Assets embedded in guideline blocks only expose a preview (no ID).
+- 🏷 Logos / photography / icons / illustrations are classified by name and folder (no API flag).
+- 🚫 Variants, revisions, comments, licenses and workflows are not exported.
 
-## ⚠️ Límites reales de la API
+> 🧪 **Verification status:** queries follow the [official reference](https://frontify.github.io/graphql-reference/) and the test suite runs against a **simulated** Frontify. It has **not yet been run against a real instance** — your first run is the real test; failures are reported, never hidden. Details: [`docs/FRONTIFY_API.md`](docs/FRONTIFY_API.md).
 
-Honestidad por delante; también se listan en cada `EXPORT_REPORT.json`:
+## 📚 About this project
 
-- 🎨 **Design tokens y componentes**: la API GraphQL oficial no los ofrece. `DESIGN_SYSTEM.md` usa Brand Essentials (colores, tipografías) y las páginas de guidelines.
-- 📄 **PDF de guidelines**: no existe en la API → se exporta Markdown + JSON original (los PDFs que sean *assets* sí se descargan).
-- 🖼 Los assets incrustados en bloques de guidelines solo exponen una previsualización (sin ID).
-- 🏷 Logos / fotografía / iconos / ilustraciones se clasifican por nombre y carpeta (no hay un campo en la API).
-- 🚫 No se exportan variantes, revisiones, comentarios, licencias ni workflows.
+<details>
+<summary><b>How it was made</b></summary>
 
-> 🧪 **Estado de verificación:** las consultas siguen la [referencia oficial](https://frontify.github.io/graphql-reference/) y los 21 tests corren contra un Frontify **simulado**. **Aún no se ha probado contra una instancia real**: tu primera ejecución es la prueba definitiva. Si algo falla, queda en el informe en vez de ocultarse. Detalle en [`docs/FRONTIFY_API.md`](docs/FRONTIFY_API.md).
+Built in a pair-programming session with an AI assistant (Claude Code), then simplified to what's really needed. Full story: [`docs/HOW_IT_WAS_MADE.md`](docs/HOW_IT_WAS_MADE.md) · architecture: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
----
+</details>
 
-## 🧰 Desarrollo
+<details>
+<summary><b>Free to use · license · warranty</b></summary>
 
-```bash
-pip install -r requirements-dev.txt
-pytest && ruff check src tests && mypy src
-python -m tests.serve_fake      # la UI real contra un Frontify simulado (token: test-token-123456)
-```
+Released under the [MIT License](LICENSE): use it, copy it, modify it, even commercially. **It is provided "as is", without warranty of any kind**, and without any promise of support or maintenance beyond what the automation provides. You are responsible for how you use it.
 
-<div align="center">
-<sub>Hecho para que cualquier IA entienda tu marca sin perder contexto. ✦</sub>
-</div>
+</details>
+
+<details>
+<summary><b>Legal & responsible use</b></summary>
+
+- **Not affiliated with, endorsed or sponsored by Frontify.** "Frontify" is a trademark of its owner, used here only to describe compatibility.
+- Use it **only on Frontify accounts you own or are explicitly authorised to export**. It only accesses what your token is allowed to access and does not bypass any permission or download protection.
+- Exported content (brand assets, guidelines, fonts) belongs to its rights holders — mind client contracts, licences and personal data before sharing or feeding it to third-party AI services.
+- Keep tokens secret; revoke them when no longer needed.
+
+</details>
+
+<details>
+<summary><b>Contributing · security · automation</b></summary>
+
+- 🤝 Issues and PRs welcome → [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
+- 🔐 Vulnerabilities → [`SECURITY.md`](SECURITY.md) (private report)
+- 🤖 Self-maintaining: **CI** (lint + types + tests on Python 3.11–3.13 + Docker build), **CodeQL**, **Dependabot** (pip, Actions, Docker; minor/patch auto-merge after green CI), **release-please** (changelog + versions from Conventional Commits), stale-issue cleanup.
+- 🧪 Dev: `pip install -r requirements-dev.txt && pytest && ruff check src tests && mypy src` · `python -m tests.serve_fake` runs the UI against a fake Frontify (token `test-token-123456`).
+
+</details>
+
+<div align="center"><sub>Made so any AI can understand your brand without losing context. ✦ <a href="LICENSE">MIT</a></sub></div>

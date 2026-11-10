@@ -1,0 +1,11 @@
+name: "Feature request / Sugerencia"
+description: "Propose an improvement / Propón una mejora"
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: "What do you need? / ¿Qué necesitas?"
+      description: "Mention the Frontify API field/query if you know it. / Indica el campo o query de la API si lo conoces."
+    validations:
+      required: true

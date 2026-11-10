@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frontify Exporter</title>
+<style>
+  :root{--bg:#f6f7f9;--card:#fff;--ink:#16181d;--mut:#667085;--line:#e4e7ec;--pri:#2a55d6;--priD:#2244ad;--ok:#12805c;--bad:#c0262d;--warn:#b25e09}
+  @media (prefers-color-scheme:dark){:root{--bg:#101216;--card:#181b21;--ink:#eceff4;--mut:#98a2b3;--line:#2a2f38;--pri:#6d8dff;--priD:#8aa4ff}}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+  main{max-width:860px;margin:0 auto;padding:24px 16px 60px}
+  h1{font-size:22px;margin:0 0 2px}.sub{color:var(--mut);margin:0 0 20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+  label{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--mut);margin:12px 0 4px}
+  label:first-child{margin-top:0}
+  input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+  input:focus{outline:2px solid var(--pri);outline-offset:-1px}
+  .row{display:flex;gap:8px}.row input{flex:1}.grid2{display:grid;grid-template-columns:1fr 130px;gap:12px}
+  button{font:inherit;font-weight:600;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 16px;cursor:pointer}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .pri{background:var(--pri);border-color:var(--pri);color:#fff}.pri:hover:not(:disabled){background:var(--priD)}
+  .big{padding:14px 22px;font-size:16px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+  .bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin:8px 0}.bar>div{height:100%;background:var(--pri);width:0;transition:width .4s}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}
+  .stat{border:1px solid var(--line);border-radius:10px;padding:10px 12px}.stat b{display:block;font-size:22px}.stat span{font-size:12px;color:var(--mut)}
+  .err b{color:var(--bad)}
+  pre{background:#0f1218;color:#d6dbe6;border-radius:10px;padding:12px;height:220px;overflow:auto;font:12px/1.5 ui-monospace,Menlo,monospace;margin:12px 0 0;white-space:pre-wrap}
+  .ERROR{color:#ff8a8f}.WARNING{color:#f5c26b}
+  .msg{padding:10px 12px;border-radius:8px;margin-top:12px;font-size:14px}.msg.bad{background:#fdecec;color:var(--bad)}.msg.ok{background:#e8f6ef;color:var(--ok)}
+  @media (prefers-color-scheme:dark){.msg.bad{background:#3a1d20}.msg.ok{background:#16322a}}
+  small{color:var(--mut)} code{background:var(--bg);padding:1px 5px;border-radius:4px}
+  ul{margin:6px 0 0 18px;padding:0} .hide{display:none}
+</style>
+</head>
+<body>
+<main>
+  <h1>Frontify Exporter</h1>
+  <p class="sub">Exporta todo lo accesible de un Frontify a una carpeta local organizada para IA. Todo se ejecuta en tu equipo.</p>
+
+  <div class="card">
+    <label for="url">URL de Frontify</label>
+    <input id="url" placeholder="https://cliente.frontify.com" autocomplete="off">
+    <label for="token">API Token</label>
+    <input id="token" type="password" autocomplete="off" placeholder="Token de acceso (no se guarda)">
+    <small id="tokenHint"></small>
+    <div class="grid2">
+      <div><label for="dest">Carpeta de destino</label>
+        <div class="row"><input id="dest"><button id="pick" type="button">Elegir…</button></div></div>
+      <div><label for="conc">Descargas en paralelo</label><input id="conc" type="number" min="1" max="32" value="4"></div>
+    </div>
+    <label for="name">Nombre de carpeta del cliente <small>(opcional; por defecto el subdominio)</small></label>
+    <input id="name" placeholder="CLIENTE_01">
+    <div class="actions">
+      <button id="analyze" type="button">ANALIZAR FRONTIFY</button>
+      <button id="export" class="pri big" type="button">EXPORTAR TODO</button>
+      <button id="cancel" type="button" class="hide">Cancelar</button>
+    </div>
+    <div id="msg"></div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between"><b id="phase">Listo</b><span id="pct">0%</span></div>
+    <div class="bar"><div id="fill"></div></div>
+    <div class="stats">
+      <div class="stat"><b id="sFound">0</b><span>archivos encontrados</span></div>
+      <div class="stat"><b id="sDl">0</b><span>archivos descargados</span></div>
+      <div class="stat"><b id="sDoc">0</b><span>documentos exportados</span></div>
+      <div class="stat err"><b id="sErr">0</b><span>errores</span></div>
+    </div>
+    <div id="result"></div>
+    <div class="actions"><button id="open" type="button" disabled>Abrir carpeta exportada</button></div>
+    <pre id="log"></pre>
+  </div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const PHASES={idle:'Listo',connecting:'Conectando…',analyzing:'Analizando estructura…',downloading:'Descargando archivos originales…',guidelines:'Exportando guidelines…',documents:'Procesando documentos…',writing:'Generando documentación para IA…',analyzed:'Análisis completado',done:'Exportación finalizada',failed:'Error'};
+const fmt=n=>{let u=['B','KB','MB','GB','TB'],i=0;n=n||0;while(n>=1024&&i<4){n/=1024;i++}return n.toFixed(i?1:0)+' '+u[i]};
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const body=()=>({url:$('url').value,token:$('token').value,dest:$('dest').value,name:$('name').value||null,concurrency:+$('conc').value||4});
+function say(t,k){$('msg').innerHTML=t?`<div class="msg ${k}">${esc(t)}</div>`:''}
+async function post(path,b){const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:b?JSON.stringify(b):undefined});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.detail||r.statusText);return j}
+async function go(kind){say('');try{await post('/api/'+kind,body())}catch(e){say(e.message,'bad')}}
+$('analyze').onclick=()=>go('analyze');$('export').onclick=()=>go('export');
+$('cancel').onclick=()=>post('/api/cancel');$('open').onclick=async()=>{try{const j=await post('/api/open-folder');if(j.error)say(j.error,'ok')}catch(e){say(e.message,'bad')}};
+$('pick').onclick=async()=>{const j=await post('/api/pick-folder');if(j.path)$('dest').value=j.path;else if(j.error)say(j.error,'bad')};
+function renderResult(r){
+  if(!r){$('result').innerHTML='';return}
+  let h='';
+  if(r.kind==='analysis'){
+    h=`<p><b>Análisis:</b> ${r.brands.length} marca(s) (${esc(r.brands.join(', ')||'—')}), ${r.libraries_workspaces} librerías/workspaces, ${r.folders} carpetas, <b>${r.assets} archivos</b> (${fmt(r.bytes)}), ${r.guideline_pages} páginas de guidelines.</p>`;
+    const t=Object.entries(r.by_type||{}).map(([k,v])=>`${k}: ${v}`).join(' · ');if(t)h+=`<small>${esc(t)}</small>`;
+    if(r.errors.length)h+=`<div class="msg bad">${r.errors.length} aviso(s) de acceso:<ul>${r.errors.slice(0,6).map(e=>`<li>${esc(e.where)} — ${esc(e.reason)}</li>`).join('')}</ul></div>`;
+    const c=r.api_capabilities||{};h+=`<p><small>API: ${c.introspection?'introspección disponible':'sin introspección'}; tokens/componentes de diseño: ${(c.design_tokens_or_components_queries||[]).length?esc(c.design_tokens_or_components_queries.join(', ')):'no expuestos por la API'}.</small></p>`;
+  }else if(r.kind==='export'&&r.summary){
+    const s=r.summary;
+    h=`<div class="msg ${s.errors?'bad':'ok'}"><b>Exportación ${r.status==='cancelled'?'cancelada':'finalizada'}.</b> Encontrados ${s.total_items_found} elementos; exportados ${s.total_items_exported}. Descargados ${s.assets_downloaded} (${fmt(s.bytes_downloaded)}), sin cambios ${s.assets_unchanged}, fallidos ${s.assets_failed}, no disponibles ${s.assets_unavailable}, páginas ${s.guideline_pages_exported}/${s.guideline_pages_found}. Detalle de errores en <code>EXPORT_REPORT.json</code>.<br><small>${esc(r.folder)}</small></div>`;
+  }else if(r.error){h=`<div class="msg bad">${esc(r.error)}</div>`}
+  $('result').innerHTML=h;
+}
+let last='';
+async function tick(){
+  try{
+    const s=await (await fetch('/api/status')).json();
+    $('phase').textContent=s.message&&s.phase==='failed'?'Error: '+s.message:(PHASES[s.phase]||s.phase)+(s.phase==='downloading'&&s.to_download?` (${s.processed}/${s.to_download})`:'');
+    $('pct').textContent=s.percent+'%';$('fill').style.width=s.percent+'%';
+    $('sFound').textContent=s.found;$('sDl').textContent=s.downloaded;$('sDoc').textContent=s.documents;$('sErr').textContent=s.errors;
+    ['analyze','export'].forEach(i=>$(i).disabled=s.running);$('cancel').classList.toggle('hide',!s.running);$('open').disabled=!s.folder||s.running;
+    const key=JSON.stringify(s.result);if(key!==last){last=key;renderResult(s.result)}
+    const lg=$('log'),stick=lg.scrollTop+lg.clientHeight>=lg.scrollHeight-20;
+    lg.innerHTML=s.logs.map(l=>`<span class="${l.level}">${l.t} ${esc(l.msg)}</span>`).join('\n');if(stick)lg.scrollTop=lg.scrollHeight;
+  }catch(e){}
+}
+setInterval(tick,1000);tick();
+fetch('/api/config').then(r=>r.json()).then(c=>{$('dest').value=c.locked?(c.host_dir||'./EXPORTS')+'  (Docker)':c.default_dest;if(c.locked)$('dest').disabled=true;if(c.default_url)$('url').value=c.default_url;
+  $('tokenHint').textContent=c.has_env_token?'Hay un token en FRONTIFY_TOKEN: déjalo vacío para usarlo.':'El token solo se usa en memoria durante la exportación.';
+  if(!c.can_pick_folder)$('pick').classList.add('hide')});
+</script>
+</body>
+</html>

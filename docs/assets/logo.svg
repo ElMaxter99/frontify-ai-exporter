@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="260" viewBox="0 0 880 260" role="img" aria-label="Frontify Exporter">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0f1226"/><stop offset="1" stop-color="#1b1f4b"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6e3a1"/><stop offset=".5" stop-color="#d4af37"/><stop offset="1" stop-color="#a77d1c"/></linearGradient>
+    <linearGradient id="vio" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c8cff"/><stop offset="1" stop-color="#b57cff"/></linearGradient>
+  </defs>
+  <rect width="880" height="260" rx="28" fill="url(#bg)"/>
+  <rect x="1.5" y="1.5" width="877" height="257" rx="26.5" fill="none" stroke="url(#gold)" stroke-opacity=".55" stroke-width="3"/>
+  <g transform="translate(70 62)">
+    <rect width="136" height="136" rx="34" fill="none" stroke="url(#gold)" stroke-width="4"/>
+    <path d="M38 36h60v18H58v14h34v18H58v30H38z" fill="url(#gold)"/>
+    <path d="M104 100l-18-18h12V66h12v16h12z" fill="url(#vio)" transform="translate(-6 8) rotate(0)"/>
+  </g>
+  <text x="250" y="128" font-family="Georgia, 'Times New Roman', serif" font-size="68" font-weight="700" fill="url(#gold)" letter-spacing="1">Frontify</text>
+  <text x="250" y="188" font-family="Georgia, 'Times New Roman', serif" font-size="68" font-weight="400" fill="#eef0ff" letter-spacing="8">EXPORTER</text>
+  <text x="252" y="222" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="17" fill="#9aa3d9" letter-spacing="3">TODO TU FRONTIFY · EN UNA CARPETA · LISTO PARA IA</text>
+</svg>

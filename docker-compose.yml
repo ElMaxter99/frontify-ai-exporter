@@ -1,0 +1,12 @@
+services:
+  frontify-exporter:
+    build: .
+    ports:
+      - "127.0.0.1:8765:8765"     # only reachable from this computer
+    volumes:
+      - ./EXPORTS:/exports         # results appear in ./EXPORTS next to this file
+    environment:
+      HOST_EXPORT_DIR: ./EXPORTS
+      FRONTIFY_URL: ${FRONTIFY_URL:-}
+      FRONTIFY_TOKEN: ${FRONTIFY_TOKEN:-}   # optional; otherwise type it in the page
+    restart: unless-stopped

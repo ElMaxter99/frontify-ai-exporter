@@ -1,6 +1,6 @@
 [project]
 name = "frontify-exporter"
-version = "1.0.0"
+version = "1.0.1"
 description = "Local tool: export everything accessible in a Frontify instance to an organised, AI-ready folder"
 requires-python = ">=3.11"
 readme = "README.md"

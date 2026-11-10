@@ -1,0 +1,41 @@
+[project]
+name = "frontify-ai-exporter"
+version = "0.1.0"
+description = "Export a Frontify instance (assets, guidelines, metadata) into an AI-ready knowledge base"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.29",
+  "httpx>=0.27",
+  "pydantic>=2.6",
+  "pydantic-settings>=2.2",
+  "numpy>=1.26",
+  "pypdf>=4.2",
+  "Pillow>=10.3",
+  "python-docx>=1.1",
+  "sse-starlette>=2.1",
+]
+
+[project.optional-dependencies]
+openai = []                     # uses httpx directly, nothing extra
+local-embeddings = ["sentence-transformers>=3.0"]
+chroma = ["chromadb>=0.5"]
+faiss = ["faiss-cpu>=1.8"]
+qdrant = ["qdrant-client>=1.9"]
+ocr = ["pytesseract>=0.3"]       # also needs the `tesseract` binary
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "ruff>=0.4", "mypy>=1.10"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+check_untyped_defs = true

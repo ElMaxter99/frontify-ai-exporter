@@ -12,7 +12,8 @@ import asyncio
 import logging
 import random
 import re
-from typing import Any, AsyncIterator, Callable
+from collections.abc import AsyncIterator, Callable
+from typing import Any
 
 import httpx
 
@@ -89,10 +90,10 @@ class FrontifyClient:
     async def aclose(self) -> None:
         await self._http.aclose()
 
-    async def __aenter__(self) -> "FrontifyClient":
+    async def __aenter__(self) -> FrontifyClient:
         return self
 
-    async def __aexit__(self, *exc: Any) -> None:
+    async def __aexit__(self, *exc: object) -> None:
         await self.aclose()
 
     # ------------------------------------------------------------------ core

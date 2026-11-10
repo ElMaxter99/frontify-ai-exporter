@@ -52,8 +52,9 @@ def render_colors(ess: dict[str, Any] | None) -> str | None:
         out.append("\n| Color | HEX | Pantone | Pantone Coated | Pantone Uncoated | Description |\n|---|---|---|---|---|---|")
         for c in ((pal.get("colors") or {}).get("items")) or []:
             rep = c.get("representations") or {}
-            g = lambda k: ((rep.get(k) or {}).get("value")) or ""  # noqa: E731
-            out.append(f"| {c.get('name')} | {g('hex')} | {g('pantone')} | {g('pantoneCoated')} | {g('pantoneUncoated')} | {(c.get('description') or '').replace(chr(10), ' ')} |")
+            vals = [((rep.get(k) or {}).get("value")) or "" for k in ("hex", "pantone", "pantoneCoated", "pantoneUncoated")]
+            desc = (c.get("description") or "").replace("\n", " ")
+            out.append(f"| {c.get('name')} | " + " | ".join(vals) + f" | {desc} |")
         out.append("")
     return "\n".join(out)
 
@@ -121,10 +122,11 @@ def build_knowledge(db: Database, layout: Layout, brand_id: str, domain: str = "
     for topic, label in labels.items():
         sec = [_header(label, brand, f"Guideline pages whose navigation path matches: {', '.join(k.strip() for k in TOPICS[topic])}.\n")]
         if extra.get(topic):
-            sec.append(extra[topic])
+            sec.append(str(extra[topic]))
         matched = [p for p in content_pages if page_matches(p, topic)]
         for p in matched:
-            sec.append(f"\n## {p['title']}\n\n*Source: {p['url'] or p['id']}*\n\n{re.sub(r'^# .*\n', '', read_page_md(p) or '', count=1).strip()}")
+            body = re.sub(r"^# .*\n", "", read_page_md(p) or "", count=1).strip()
+            sec.append(f"\n## {p['title']}\n\n*Source: {p['url'] or p['id']}*\n\n{body}")
         if not extra.get(topic) and not matched:
             sec.append(f"_Frontify returned no {label.lower()} data for this brand (no matching Brand Essentials or guideline pages)._")
         files[f"{topic}.md"] = "\n".join(sec) + "\n"

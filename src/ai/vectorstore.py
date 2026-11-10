@@ -35,11 +35,11 @@ class SqliteVectorStore:
     def __init__(self, db: Database) -> None:
         self.db = db
 
-    def upsert(self, ids, vectors, texts, metas) -> None:  # noqa: ANN001
+    def upsert(self, ids, vectors, texts, metas) -> None:
         rows = [(i, np.asarray(v, dtype=np.float32).tobytes(), len(v)) for i, v in zip(ids, vectors)]
         self.db.executemany("UPDATE chunks SET vector=?, dim=? WHERE id=?", [(b, d, i) for i, b, d in rows])
 
-    def search(self, vector, k, brand_id):  # noqa: ANN001
+    def search(self, vector, k, brand_id):
         sql = "SELECT id, vector FROM chunks WHERE vector IS NOT NULL" + (" AND brand_id=?" if brand_id else "")
         rows = self.db.query(sql, (brand_id,) if brand_id else ())
         if not rows:
@@ -54,7 +54,7 @@ class SqliteVectorStore:
         top = np.argsort(-scores)[:k]
         return [(rows[i]["id"], float(scores[i])) for i in top]
 
-    def reset(self, brand_id) -> None:  # noqa: ANN001
+    def reset(self, brand_id) -> None:
         self.db.execute("UPDATE chunks SET vector=NULL, dim=NULL" + (" WHERE brand_id=?" if brand_id else ""), (brand_id,) if brand_id else ())
 
 
@@ -66,16 +66,16 @@ class ChromaVectorStore:
 
         self.col = chromadb.PersistentClient(path=str(path / "chroma")).get_or_create_collection("frontify", metadata={"hnsw:space": "cosine"})
 
-    def upsert(self, ids, vectors, texts, metas) -> None:  # noqa: ANN001
+    def upsert(self, ids, vectors, texts, metas) -> None:
         flat = [{k: (v if isinstance(v, (str, int, float, bool)) else json.dumps(v)) for k, v in m.items() if v is not None} for m in metas]
         for i in range(0, len(ids), 500):
             self.col.upsert(ids=ids[i:i + 500], embeddings=vectors[i:i + 500], documents=texts[i:i + 500], metadatas=flat[i:i + 500])
 
-    def search(self, vector, k, brand_id):  # noqa: ANN001
+    def search(self, vector, k, brand_id):
         r = self.col.query(query_embeddings=[vector], n_results=k, where={"brand_id": brand_id} if brand_id else None)
         return [(i, 1 - d) for i, d in zip(r["ids"][0], r["distances"][0])]
 
-    def reset(self, brand_id) -> None:  # noqa: ANN001
+    def reset(self, brand_id) -> None:
         self.col.delete(where={"brand_id": brand_id}) if brand_id else self.col.delete(where={})
 
 
@@ -89,7 +89,7 @@ class FaissVectorStore:
 
         self.path, self.db = path / "faiss.index", db
         self.ids: list[str] = []
-        self.index = None
+        self.index: Any = None
 
     def _rebuild(self, dim: int) -> None:
         import faiss
@@ -101,11 +101,11 @@ class FaissVectorStore:
             self.index.add(_unit(np.vstack([np.frombuffer(r["vector"], dtype=np.float32) for r in rows])))
         faiss.write_index(self.index, str(self.path))
 
-    def upsert(self, ids, vectors, texts, metas) -> None:  # noqa: ANN001
+    def upsert(self, ids, vectors, texts, metas) -> None:
         SqliteVectorStore(self.db).upsert(ids, vectors, texts, metas)  # vectors stay the source of truth
         self._rebuild(len(vectors[0]))
 
-    def search(self, vector, k, brand_id):  # noqa: ANN001
+    def search(self, vector, k, brand_id):
         if self.index is None:
             self._rebuild(len(vector))
         q = _unit(np.asarray(vector, dtype=np.float32)[None, :])
@@ -116,7 +116,7 @@ class FaissVectorStore:
             hits = [h for h in hits if h[0] in ok][:k]
         return hits
 
-    def reset(self, brand_id) -> None:  # noqa: ANN001
+    def reset(self, brand_id) -> None:
         SqliteVectorStore(self.db).reset(brand_id)
         self.index = None
 
@@ -136,7 +136,7 @@ class QdrantVectorStore:
 
         return str(uuid.uuid5(uuid.NAMESPACE_URL, i))
 
-    def upsert(self, ids, vectors, texts, metas) -> None:  # noqa: ANN001
+    def upsert(self, ids, vectors, texts, metas) -> None:
         from qdrant_client.models import Distance, PointStruct, VectorParams
 
         if not self.c.collection_exists(self.coll):
@@ -145,14 +145,14 @@ class QdrantVectorStore:
         for j in range(0, len(pts), 256):
             self.c.upsert(self.coll, points=pts[j:j + 256])
 
-    def search(self, vector, k, brand_id):  # noqa: ANN001
+    def search(self, vector, k, brand_id):
         from qdrant_client.models import FieldCondition, Filter, MatchValue
 
         flt = Filter(must=[FieldCondition(key="brand_id", match=MatchValue(value=brand_id))]) if brand_id else None
         res = self.c.query_points(self.coll, query=vector, limit=k, query_filter=flt).points
         return [(p.payload["chunk_id"], p.score) for p in res]
 
-    def reset(self, brand_id) -> None:  # noqa: ANN001
+    def reset(self, brand_id) -> None:
         if self.c.collection_exists(self.coll) and not brand_id:
             self.c.delete_collection(self.coll)
 

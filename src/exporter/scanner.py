@@ -111,7 +111,7 @@ class Scanner:
         try:
             q, path = Q.container_total_query(kind)
             data = await self.client.execute(q, {"id": cid}, operation="ContainerTotal")
-            node = data
+            node: Any = data
             for k in path:
                 node = (node or {}).get(k)
             expected = (node or {}).get("total")

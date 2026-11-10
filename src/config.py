@@ -61,7 +61,7 @@ class Settings(BaseSettings):
 def normalize_domain(value: str) -> str:
     """``https://Acme.frontify.com/foo`` -> ``acme.frontify.com``."""
     v = value.strip()
-    v = re.sub(r"^https?://", "", v, flags=re.I)
+    v = re.sub(r"^https?://", "", v, flags=re.IGNORECASE)
     return v.split("/")[0].strip().lower()
 
 

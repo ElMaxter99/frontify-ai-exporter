@@ -5,7 +5,8 @@ import asyncio
 import json
 import logging
 import uuid
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from src.database.db import Database
 from src.exporter.pipeline import ExportOptions, Pipeline

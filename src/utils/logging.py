@@ -39,7 +39,7 @@ class RedactingFilter(logging.Filter):
 class BusHandler(logging.Handler):
     """Mirrors log records into the EventBus so the UI can tail them."""
 
-    def __init__(self, bus) -> None:  # noqa: ANN001
+    def __init__(self, bus) -> None:
         super().__init__(level=logging.INFO)
         self.bus = bus
 
@@ -50,7 +50,7 @@ class BusHandler(logging.Handler):
             pass
 
 
-def setup_logging(level: str = "INFO", bus=None) -> None:  # noqa: ANN001
+def setup_logging(level: str = "INFO", bus=None) -> None:
     root = logging.getLogger()
     root.setLevel(level.upper())
     for h in list(root.handlers):

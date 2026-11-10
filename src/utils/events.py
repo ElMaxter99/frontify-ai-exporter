@@ -48,4 +48,4 @@ class EventBus:
 
     def unsubscribe(self, q: asyncio.Queue) -> None:
         with self._lock:
-            self._subs = [(l, s) for (l, s) in self._subs if s is not q]
+            self._subs = [(lp, s) for (lp, s) in self._subs if s is not q]

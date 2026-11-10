@@ -43,7 +43,7 @@ class ExportOptions:
     kind: str = "export"
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "ExportOptions":
+    def from_dict(cls, d: dict[str, Any]) -> ExportOptions:
         def s(k: str) -> set[str] | None:
             v = d.get(k)
             return set(v) if v else None
@@ -176,6 +176,7 @@ class Pipeline:
         failed = db.query("SELECT id,title,folder_path,error,attempts FROM assets WHERE download_status='failed' AND status='active'")
         unavailable = db.query("SELECT id,title,folder_path,error FROM assets WHERE download_status='unavailable' AND status='active'")
         changes = db.query("SELECT entity, change, count(*) n FROM changes WHERE run_id=? GROUP BY entity, change", (run_id,))
+        total_bytes = db.scalar("SELECT coalesce(sum(size),0) FROM assets WHERE status='active' AND download_status='done'")
         pages_failed = db.query("SELECT id,title,error FROM guideline_pages WHERE export_status IN ('failed','inaccessible')")
         return {
             "totals": {
@@ -192,7 +193,7 @@ class Pipeline:
             "failed_assets": failed,
             "unavailable_assets": unavailable,
             "failed_guideline_pages": pages_failed,
-            "human": f"{human_size(db.scalar('SELECT coalesce(sum(size),0) FROM assets WHERE status=\"active\" AND download_status=\"done\"'))} exported",
+            "human": f"{human_size(total_bytes)} exported",
         }
 
     def _write_global(self, layout: Layout, report: dict[str, Any]) -> None:

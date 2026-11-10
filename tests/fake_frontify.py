@@ -141,60 +141,60 @@ class FakeFrontify:
         return httpx.Response(200, content=data)
 
     # ------------------------------------------------------------- operations
-    def op_CurrentUser(self, v):  # noqa: ANN001
+    def op_CurrentUser(self, v):
         return {"currentUser": {"id": "u1", "name": "Jane"}}
 
-    def op_Brands(self, v):  # noqa: ANN001
+    def op_Brands(self, v):
         return {"brands": self.state["brands"]}
 
-    def op_BrandLibraries(self, v):  # noqa: ANN001
+    def op_BrandLibraries(self, v):
         return {"brand": {"libraries": conn(self.state["libraries"], v["page"], v["limit"])}}
 
-    def op_BrandWorkspaces(self, v):  # noqa: ANN001
+    def op_BrandWorkspaces(self, v):
         return {"brand": {"workspaceProjects": conn([], v["page"], v["limit"])}}
 
-    def op_RootFolders(self, v):  # noqa: ANN001
+    def op_RootFolders(self, v):
         return {"library": {"browse": {"folders": conn(self.state["folders"].get(v["id"], []), v["page"], v["limit"])}}}
 
-    def op_FolderChildren(self, v):  # noqa: ANN001
+    def op_FolderChildren(self, v):
         return {"node": {"folders": conn(self.state["folders"].get(v["id"], []), v["page"], v["limit"])}}
 
-    def op_RootAssets(self, v):  # noqa: ANN001
+    def op_RootAssets(self, v):
         return {"library": {"browse": {"assets": conn(self.state["assets"].get(v["id"], []), v["page"], v["limit"])}}}
 
-    def op_FolderAssets(self, v):  # noqa: ANN001
+    def op_FolderAssets(self, v):
         return {"node": {"assets": conn(self.state["assets"].get(v["id"], []), v["page"], v["limit"])}}
 
-    def op_ContainerTotal(self, v):  # noqa: ANN001
+    def op_ContainerTotal(self, v):
         def count(node: str) -> int:
             return len(self.state["assets"].get(node, [])) + sum(count(f["id"]) for f in self.state["folders"].get(node, []))
         return {"library": {"assets": {"total": count(v["id"])}}}
 
-    def op_LibraryCollections(self, v):  # noqa: ANN001
+    def op_LibraryCollections(self, v):
         return {"library": {"collections": conn(self.state["collections"].get(v["id"], []), v["page"], v["limit"])}}
 
-    def op_CollectionAssets(self, v):  # noqa: ANN001
+    def op_CollectionAssets(self, v):
         return {"node": {"assets": conn([{"id": i} for i in self.state["collection_assets"][v["id"]]], v["page"], v["limit"])}}
 
-    def op_AssetDownloadUrls(self, v):  # noqa: ANN001
+    def op_AssetDownloadUrls(self, v):
         allx = self.all_assets()
         return {"assets": [{"id": i, "downloadUrl": allx[i]["downloadUrl"]} for i in v["ids"] if i in allx]}
 
-    def op_AssetRelated(self, v):  # noqa: ANN001
+    def op_AssetRelated(self, v):
         return {"assets": [{"id": i, "relatedAssets": {"total": len(self.state["related"].get(i, [])),
                                                        "items": [{"id": r} for r in self.state["related"].get(i, [])]}} for i in v["ids"]]}
 
-    def op_BrandGuidelines(self, v):  # noqa: ANN001
+    def op_BrandGuidelines(self, v):
         return {"brand": {"guidelines": conn(self.state["guidelines"], v["page"], v["limit"])}}
 
-    def op_GuidelineNav(self, v):  # noqa: ANN001
+    def op_GuidelineNav(self, v):
         return {"node": {"navigation": conn(self.state["nav"][v["id"]], v["page"], v["limit"])}}
 
-    def op_NavChildren(self, v):  # noqa: ANN001
+    def op_NavChildren(self, v):
         key, items = self.state["children"].get(v["id"], ("docChildren", []))
         return {"guidelineNavigationItem": {"__typename": "x", key: conn(items, v["page"], v["limit"])}}
 
-    def op_GuidelinePageContent(self, v):  # noqa: ANN001
+    def op_GuidelinePageContent(self, v):
         p = self.state["pages"].get(v["id"])
         if not p:
             return {"guidelinePage": None}
@@ -202,8 +202,8 @@ class FakeFrontify:
         return {"guidelinePage": {"id": p["id"], "title": p["title"], "url": p["url"], "modifiedAt": p["modifiedAt"],
                                   "sections": conn(secs, v["page"], v["limit"])}}
 
-    def op_LibraryPageAssets(self, v):  # noqa: ANN001
+    def op_LibraryPageAssets(self, v):
         return {"node": {"assets": conn([{"id": i} for i in self.state["library_page_assets"].get(v["id"], [])], v["page"], v["limit"])}}
 
-    def op_BrandEssentials(self, v):  # noqa: ANN001
+    def op_BrandEssentials(self, v):
         return {"brand": {"essentials": self.state["essentials"]}}

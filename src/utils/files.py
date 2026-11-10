@@ -6,6 +6,7 @@ import json
 import os
 import re
 import unicodedata
+from datetime import UTC
 from pathlib import Path
 from typing import Any
 
@@ -56,7 +57,7 @@ def write_text(path: Path, text: str) -> None:
     os.replace(tmp, path)
 
 
-def human_size(n: int | float | None) -> str:
+def human_size(n: float | None) -> str:
     n = float(n or 0)
     for unit in ("B", "KB", "MB", "GB", "TB"):
         if n < 1024 or unit == "TB":
@@ -66,13 +67,13 @@ def human_size(n: int | float | None) -> str:
 
 
 def utcnow_iso() -> str:
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def utcnow_precise() -> str:
     """Microsecond ISO timestamp: used as a scan token (strictly increasing between runs)."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    return datetime.now(timezone.utc).isoformat(timespec="microseconds")
+    return datetime.now(UTC).isoformat(timespec="microseconds")

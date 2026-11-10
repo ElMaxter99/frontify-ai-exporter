@@ -11,7 +11,7 @@ def list_runs(db: Database, limit: int = 30) -> list[dict[str, Any]]:
     out = []
     for r in db.query("SELECT * FROM sync_runs ORDER BY id DESC LIMIT ?", (limit,)):
         summary = json.loads(r["summary"]) if r["summary"] else {}
-        counts = {}
+        counts: dict[str, dict[str, int]] = {}
         for c in db.query("SELECT entity, change, count(*) n FROM changes WHERE run_id=? GROUP BY entity, change", (r["id"],)):
             counts.setdefault(c["entity"], {})[c["change"]] = c["n"]
         out.append({"id": r["id"], "kind": r["kind"], "started_at": r["started_at"], "finished_at": r["finished_at"],

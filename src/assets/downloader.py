@@ -197,6 +197,6 @@ class AssetDownloader:
 
     def _fail(self, row: dict[str, Any], msg: str) -> None:
         log.error("asset %s '%s' failed: %s", row["id"], row["title"], msg)
-        msg = re.sub(r"https?://\S+", "<url>", msg)
+        msg = re.sub(r"https?://\S+", "<url>", msg.splitlines()[0] if msg else msg)
         self.repo.db.execute("UPDATE assets SET download_status='failed', error=?, attempts=attempts+1 WHERE id=?", (msg[:500], row["id"]))
         self.stats["failed"] += 1

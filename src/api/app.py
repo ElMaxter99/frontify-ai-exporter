@@ -131,7 +131,7 @@ def create_app(settings: Settings | None = None, *, api_transport: httpx.AsyncBa
                     try:
                         e = await asyncio.wait_for(q.get(), 15)
                         yield {"event": e["kind"], "id": str(e["id"]), "data": json.dumps(e)}
-                    except asyncio.TimeoutError:
+                    except TimeoutError:
                         yield {"event": "ping", "data": "{}"}
             finally:
                 bus.unsubscribe(q)

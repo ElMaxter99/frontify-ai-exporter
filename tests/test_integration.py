@@ -72,7 +72,7 @@ async def test_full_export_structure_integrity_and_isolation(env, fake: FakeFron
     assert any("friendly and direct" in p.read_text() for p in (k / "extracted_text").glob("*.md"))
 
     # --- chunks carry provenance
-    chunks = [json.loads(l) for l in (k / "chunks.jsonl").read_text().splitlines()]
+    chunks = [json.loads(line) for line in (k / "chunks.jsonl").read_text().splitlines()]
     assert chunks
     for c in chunks:
         for key in ("brand", "frontify_id", "source_file", "category", "folder", "extracted_at", "kind"):

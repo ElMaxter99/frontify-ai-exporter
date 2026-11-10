@@ -13,7 +13,7 @@ import httpx
 from src.database.repo import Repo
 from src.exporter.layout import Layout
 from src.frontify import queries as Q
-from src.frontify.client import FrontifyClient, FrontifyError, FrontifyGraphQLError
+from src.frontify.client import FrontifyClient, FrontifyGraphQLError
 from src.guidelines.markdown import render_library_page, render_page
 from src.utils.events import EventBus
 from src.utils.files import safe_name, sha1_text, slugify, utcnow_iso, write_json, write_text

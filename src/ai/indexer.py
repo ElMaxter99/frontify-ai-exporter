@@ -10,7 +10,7 @@ from typing import Any
 from src.ai.chunking import Chunk, chunk_markdown, chunk_plain
 from src.ai.embeddings import Embedder
 from src.ai.extract import extract_text, image_metadata
-from src.ai.vectorstore import VectorStore, fts_query, SqliteVectorStore
+from src.ai.vectorstore import SqliteVectorStore, VectorStore, fts_query
 from src.database.db import Database
 from src.exporter.layout import Layout
 from src.utils.events import EventBus

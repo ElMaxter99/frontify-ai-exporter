@@ -11,8 +11,8 @@ DOC_EXT = {"pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "md", "rtf
            "odt", "ods", "odp", "indd", "idml", "html", "htm", "json", "xml", "zip"}
 FONT_EXT = {"ttf", "otf", "woff", "woff2", "eot"}
 
-_LOGO = re.compile(r"\blogo|logotype|wordmark|brandmark|emblem", re.I)
-_ICON = re.compile(r"\bicon|pictogram|glyph", re.I)
+_LOGO = re.compile(r"\blogo|logotype|wordmark|brandmark|emblem", re.IGNORECASE)
+_ICON = re.compile(r"\bicon|pictogram|glyph", re.IGNORECASE)
 
 CATEGORIES = ["images", "logos", "icons", "videos", "audio", "documents", "fonts", "other"]
 

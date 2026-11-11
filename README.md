@@ -125,6 +125,10 @@ EXPORTS/CLIENT_01/
 
 **Golden rules:** originals are never replaced by summaries · missing data reads *"Not available"* instead of being invented · everything carries its source (Frontify URL / ID).
 
+## 🧩 Chrome extension (open the portal yourself, it captures)
+
+Easiest and lightest on the client's portal: install [`extension/`](extension/README.md) (Chrome → Developer mode → *Load unpacked*), open the Frontify portal logged in as usual and click **Capture** on the pages you need (or enable auto-capture while you browse). **Export ZIP** produces the same folder layout as the other modes. No token, no crawler, nothing leaves your browser.
+
 ## 🌐 Browser mode (no API token)
 
 If you only have a **login** to the client's portal, read it the way you see it in a browser. One page at a time, with a pause between pages, an honest User-Agent, `robots.txt` respected, tracker hosts blocked, and every request counted in `EXPORT_REPORT.json`.

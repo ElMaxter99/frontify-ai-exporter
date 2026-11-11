@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Frontify Brand Capture",
+  "version": "0.1.0",
+  "description": "Capture the Frontify brand portal pages you open (text, colours, fonts, images, downloads) into an AI-ready ZIP. Independent project, not affiliated with Frontify.",
+  "permissions": ["activeTab", "scripting", "storage", "unlimitedStorage", "tabs"],
+  "host_permissions": ["https://*.frontify.com/*"],
+  "optional_host_permissions": ["https://*/*"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": { "default_title": "Frontify Brand Capture", "default_popup": "popup.html" }
+}

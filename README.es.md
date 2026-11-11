@@ -125,6 +125,22 @@ EXPORTS/CLIENTE_01/
 
 **Reglas de oro:** los originales jamás se sustituyen por resúmenes · si un dato no existe, el documento dice *“Not available”* en vez de inventarlo · todo lleva su fuente (URL / ID de Frontify).
 
+## 🧩 Extensión de Chrome (abres tú el portal y ella captura)
+
+La opción más sencilla y la que menos carga genera en el portal del cliente: instala [`extension/`](extension/README.md) (Chrome → Modo desarrollador → *Cargar descomprimida*), abre el portal de Frontify con tu sesión de siempre y pulsa **Capturar** en las páginas que necesites (o activa la auto-captura mientras navegas). **Exportar ZIP** genera la misma estructura de carpetas que los otros modos. Sin token, sin rastreador, nada sale de tu navegador.
+
+## 🌐 Modo navegador (sin token de API)
+
+Si solo tienes un **login** del portal del cliente, léelo como lo ves en el navegador. Una página cada vez, con pausa entre páginas, User-Agent honesto, `robots.txt` respetado, hosts de tracking bloqueados y cada petición contada en `EXPORT_REPORT.json`.
+
+```bash
+pip install -r requirements-browser.txt && python -m playwright install chromium
+python -m src browse-login --url https://cliente.frontify.com     # inicias sesión una vez en una ventana visible → guarda .browser_state/ (privado, como una contraseña)
+python -m src browse --url https://cliente.frontify.com --name CLIENTE_01 --delay 3 [--click-downloads] [--no-files]
+```
+
+Misma carpeta de salida (`01_BRAND_GUIDELINES`, `02_ASSETS`, `06_AI_KNOWLEDGE`…). Límites: sin metadatos estructurados (etiquetas, campos personalizados), colores/fuentes heurísticos y los archivos originales solo se guardan donde el portal ofrezca descarga a tu usuario. Aún no probado contra un portal real (sí contra uno local simulado). Avisa al cliente antes de ejecutarlo.
+
 ## 🛡 Fiabilidad
 
 - ♻️ **Reanudable** — relanza y continúa; las descargas parciales se retoman (HTTP Range).

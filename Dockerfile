@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.15-slim
 ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 EXPORT_DIR=/exports EXPORT_DIR_LOCKED=1
 WORKDIR /app
 COPY requirements.txt ./

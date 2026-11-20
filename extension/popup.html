@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Frontify Brand Capture</title>
+<style>
+  :root { color-scheme: light dark; --bg:#fff; --fg:#1b1d24; --mut:#6b7080; --ac:#12805c; --line:#d9dce5; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#1b1d24; --fg:#eceef5; --mut:#9aa0b4; --line:#363a48; } }
+  body { margin:0; width:340px; padding:14px; font:13px/1.4 system-ui,sans-serif; background:var(--bg); color:var(--fg); }
+  h1 { font-size:15px; margin:0 0 2px; } .mut { color:var(--mut); font-size:12px; }
+  button { width:100%; padding:9px; margin:6px 0 0; border:0; border-radius:6px; background:var(--ac); color:#fff; font-size:13px; cursor:pointer; }
+  button.sec { background:transparent; color:var(--fg); border:1px solid var(--line); } button:disabled { opacity:.5; cursor:default; }
+  label { display:flex; gap:8px; align-items:flex-start; margin:8px 0 0; } .row { border-top:1px solid var(--line); margin-top:10px; padding-top:6px; }
+  #log { margin-top:8px; font-size:12px; min-height:16px; } ul { margin:6px 0 0; padding-left:16px; max-height:90px; overflow:auto; font-size:12px; }
+  input[type=number] { width:56px; }
+</style></head>
+<body>
+  <h1>Frontify Brand Capture</h1>
+  <div class="mut" id="site">—</div>
+  <button id="cap">Capturar esta página</button>
+  <label><input type="checkbox" id="auto"><span>Capturar automáticamente cada página que abra en este sitio<br><span class="mut">Solo mientras esté activado; pide permiso para el sitio.</span></span></label>
+  <div class="row"><b id="count">0 páginas capturadas</b><ul id="list"></ul></div>
+  <label><input type="checkbox" id="files" checked><span>Incluir imágenes y archivos descargables enlazados<br><span class="mut">Se piden al exportar, uno a uno, con tu sesión.</span></span></label>
+  <label>Pausa entre archivos <input type="number" id="delay" min="0" max="10" step="0.5" value="1"> s</label>
+  <button id="exp" disabled>Exportar ZIP</button>
+  <button id="clr" class="sec" disabled>Borrar captura</button>
+  <div id="log"></div>
+  <div class="mut" style="margin-top:8px">Proyecto independiente, sin afiliación con Frontify. Úsalo solo en portales a los que estás autorizado. Nada sale de tu navegador.</div>
+  <script type="module" src="popup.js"></script>
+</body></html>
